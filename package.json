@@ -1,0 +1,24 @@
+{
+    "name": "my_github_projects_automation",
+    "version": "0.0.0",
+    "description": "A GitHub action to automate my GitHub projects",
+    "main": "index.js",
+    "scripts": {
+        "build": "ncc build index.js --watch"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/SH1RL0CK/my_github_projects_automation.git"
+    },
+    "keywords": [],
+    "author": "SH1RL0CK",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/SH1RL0CK/my_github_projects_automation/issues"
+    },
+    "homepage": "https://github.com/SH1RL0CK/my_github_projects_automation#readme",
+    "dependencies": {
+        "@actions/core": "^1.10.0",
+        "@actions/github": "^5.1.1"
+    }
+}

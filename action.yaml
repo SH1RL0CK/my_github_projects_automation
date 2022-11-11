@@ -1,0 +1,12 @@
+name: My GitHub Projects Automations
+description: Automate my GitHub Projects
+inputs:
+    project-url:
+      required: true
+      description: URL of the project
+    github-token:
+      required: true
+      description: A GitHub personal access token with write access to the project 
+runs:
+    using: node16
+    main: dist/index.js
