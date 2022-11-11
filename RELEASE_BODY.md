@@ -1,1 +1,1 @@
-Fix: I forgot to set the type to "module" in package.json
+Fix: Run the ncc build command on linux
