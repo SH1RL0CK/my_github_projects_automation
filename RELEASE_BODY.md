@@ -1,1 +1,1 @@
-First stable release of the action
+Fix: I forgot to set the type to "module" in package.json

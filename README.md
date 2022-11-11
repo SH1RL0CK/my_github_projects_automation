@@ -43,7 +43,7 @@ jobs:
     name: Automate my GitHub project
     steps:
       - name: Automate my GitHub project
-        uses: SH1RL0CK/my_github_projects_automation@v1 
+        uses: SH1RL0CK/my_github_projects_automation@v1.0.1 
         with:
           project-url: https://github.com/users/<ownerName>/projects/<projectNumber> 
           github-token: ${{ secrets.PROJECT_AUTOMATION_PAT }}
