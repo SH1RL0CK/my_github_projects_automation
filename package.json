@@ -3,6 +3,7 @@
     "version": "0.0.0",
     "description": "A GitHub action to automate my GitHub projects",
     "main": "index.js",
+    "type": "module",
     "scripts": {
         "build": "ncc build index.js --watch"
     },
