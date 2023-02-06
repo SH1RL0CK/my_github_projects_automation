@@ -1,0 +1,29 @@
+{
+    "name": "my_github_projects_automation",
+    "version": "0.0.0",
+    "description": "A GitHub action to automate my GitHub projects",
+    "main": "lib/main.js",
+    "scripts": {
+        "build": "npm run build:compile && npm run build:package",
+        "build:compile": "tsc",
+        "build:package": "ncc build --source-map --license licenses.txt",
+        "prepare": "husky install"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/SH1RL0CK/my_github_projects_automation.git"
+    },
+    "author": "SH1RL0CK",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/SH1RL0CK/my_github_projects_automation/issues"
+    },
+    "homepage": "https://github.com/SH1RL0CK/my_github_projects_automation#readme",
+    "devDependencies": {
+        "@types/node": "^18.11.19",
+        "typescript": "^4.9.5"
+    },
+    "dependencies": {
+        "@actions/core": "^1.10.0"
+    }
+}

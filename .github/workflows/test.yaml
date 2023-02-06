@@ -1,0 +1,12 @@
+name: "My Github Project Automation"
+on:
+    push:
+
+jobs:
+    test:
+        runs-on: "ubuntu-latest"
+        steps:
+            - uses: actions/checkout@v3
+            - uses: ./
+              with:
+                  name: "Rüdiger"

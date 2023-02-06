@@ -1,0 +1,10 @@
+name: "My GitHub Projects Automation"
+description: "A GitHub action to automate my GitHub projects"
+author: "SH1RL0CK"
+inputs:
+    name: # change this
+        required: true
+        description: "Name you want to greet"
+runs:
+    using: "node16"
+    main: "dist/index.js"
