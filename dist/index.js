@@ -32,7 +32,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(903));
 const name = core.getInput("name", { required: true });
-core.debug(`Hello ${name}!`);
+console.log(`hello ${name}`);
 core.setOutput("name", name);
 
 
