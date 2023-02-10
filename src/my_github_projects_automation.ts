@@ -235,6 +235,7 @@ async function getProjectFields(
         inReviewOptionID = "";
     const projectFields: ProjectField[] = [];
     for (const field of projectFieldsResponse.node.fields.nodes) {
+        console.log(field);
         if (field.name === "Status") {
             statusFieldID = field.id;
             for (const option of field.options) {
