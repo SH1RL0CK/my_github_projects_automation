@@ -139,6 +139,7 @@ function addIssueToProejct(octokit, projectID, issueNodeID) {
 function handleActionEvent(octokit, context, projectID, input) {
     return __awaiter(this, void 0, void 0, function* () {
         const payload = context.payload;
+        console.log("Event Name:", context.eventName);
         switch (context.eventName) {
             case "issue":
                 const issueInfo = payload.issue;
@@ -157,6 +158,7 @@ function run() {
         const input = getInput(context.repo.owner);
         const octokit = github.getOctokit(input.githubToken);
         const projectID = yield getProjectID(octokit, input.projectOwner, input.projectNumber);
+        console.log("projectID:", projectID);
         yield handleActionEvent(octokit, context, projectID, input);
     });
 }
