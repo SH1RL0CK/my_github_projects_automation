@@ -117,7 +117,7 @@ function getProjectID(octokit, projectOwner, projectNumber) {
             projectOwnerName: projectOwner,
             projectNumber: projectNumber,
         });
-        if (projectIDResponse === null) {
+        if (projectIDResponse.user.projectV2 === null) {
             throw Error(`Project with owner ${projectOwner} and number ${projectNumber} doesn't exist!`);
         }
         return projectIDResponse.user.projectV2.id;

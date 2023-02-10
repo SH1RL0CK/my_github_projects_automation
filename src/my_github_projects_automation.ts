@@ -70,7 +70,7 @@ async function getProjectID(
                 projectNumber: projectNumber,
             }
         );
-    if (projectIDResponse === null) {
+    if (projectIDResponse.user.projectV2 === null) {
         throw Error(
             `Project with owner ${projectOwner} and number ${projectNumber} doesn't exist!`
         );
