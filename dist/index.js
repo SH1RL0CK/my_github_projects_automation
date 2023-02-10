@@ -179,7 +179,7 @@ function getProjectFields(octokit, projectID, fieldsInput) {
         const projectFieldsResponse = yield octokit.graphql(`query getProjectFields($projectId: ID!) {
                 node(id: $projectId) {
                         ... on ProjectV2 {
-                            fields(first: 20) {
+                            fields(first: 100) {
                                 nodes {
                                 ... on ProjectV2SingleSelectField {
                                     id
