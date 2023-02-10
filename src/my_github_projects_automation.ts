@@ -1,7 +1,7 @@
 import * as core from "@actions/core";
 import * as github from "@actions/github";
 import { Context } from "@actions/github/lib/context";
-import { Octokit } from "@octokit/action";
+import { Octokit } from "octokit";
 
 interface ProjectFieldInput {
     fieldName: string;
