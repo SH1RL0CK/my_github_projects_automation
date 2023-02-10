@@ -70,6 +70,11 @@ async function getProjectID(
                 projectNumber: projectNumber,
             }
         );
+    if (projectIDResponse === null) {
+        throw Error(
+            `Project with owner ${projectOwner} and number ${projectNumber} doesn't exist!`
+        );
+    }
     return projectIDResponse.user.projectV2.id;
 }
 
@@ -115,6 +120,8 @@ async function handleActionEvent(
                         issueInfo?.node_id as string
                     );
             }
+            break;
+        case "assigned":
             break;
     }
 }

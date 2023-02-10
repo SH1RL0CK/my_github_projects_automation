@@ -117,6 +117,9 @@ function getProjectID(octokit, projectOwner, projectNumber) {
             projectOwnerName: projectOwner,
             projectNumber: projectNumber,
         });
+        if (projectIDResponse === null) {
+            throw Error(`Project with owner ${projectOwner} and number ${projectNumber} doesn't exist!`);
+        }
         return projectIDResponse.user.projectV2.id;
     });
 }
@@ -148,6 +151,8 @@ function handleActionEvent(octokit, context, projectID, input) {
                         issueInfo.node_id;
                         yield addIssueToProejct(octokit, projectID, issueInfo === null || issueInfo === void 0 ? void 0 : issueInfo.node_id);
                 }
+                break;
+            case "assigned":
                 break;
         }
     });
