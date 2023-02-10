@@ -21,7 +21,7 @@ jobs:
             - name: Automate my GitHub project
               uses: ./
               with:
-                  project-number: 30
+                  project-number: 11
                   github-token: ${{ secrets.PROJECT_AUTOMATION_PAT }}
                   field-names: Type
                   field-values: 🔥 Server
