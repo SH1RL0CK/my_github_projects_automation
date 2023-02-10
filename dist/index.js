@@ -199,18 +199,16 @@ function getProjectFields(octokit, projectID, fieldsInput) {
         let statusFieldID = "", inProgressOptionID = "", inReviewOptionID = "";
         const projectFields = [];
         for (const field of projectFieldsResponse.node.fields.nodes) {
-            console.log(field);
             if (field.name === "Status") {
                 statusFieldID = field.id;
                 for (const option of field.options) {
-                    if (option.name.includes("In Progress")) {
+                    if (option.name.toLowerCase().includes("in progress")) {
                         inProgressOptionID = option.id;
                     }
-                    else if (option.name.includes("In Review")) {
+                    else if (option.name.toLowerCase().includes("in review")) {
                         inReviewOptionID = option.id;
                     }
                 }
-                break;
             }
             const fieldIndex = fieldsInput.findIndex((element) => element.fieldName === field.name);
             if (fieldIndex !== -1) {
@@ -269,11 +267,10 @@ function handleActionEvent(octokit, context, projectID, projectFields) {
                     case "opened":
                         issueInfo.node_id;
                         const issueProjectItemID = yield addIssueToProejct(octokit, projectID, issueInfo === null || issueInfo === void 0 ? void 0 : issueInfo.node_id);
-                        core.info("✅ Successfully added issue to project!");
                         for (const field of projectFields.otherFields) {
                             yield setProjectFieldOption(octokit, projectID, issueProjectItemID, field.fieldID, field.optionID);
                         }
-                        core.info("✅ Successfully added issue to project!");
+                        core.info("✅ Successfully added issue to the project!");
                 }
                 break;
             case "assigned":
