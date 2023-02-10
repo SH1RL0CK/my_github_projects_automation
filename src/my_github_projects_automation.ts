@@ -256,12 +256,12 @@ async function getProjectFields(
             if (option !== undefined) {
                 projectFields.push({ fieldID: field.id, optionID: option.id });
             }
-            fieldsInput.slice(fieldIndex, 0);
+            fieldsInput.slice(fieldIndex, 1);
         }
     }
     if (fieldsInput.length > 0) {
         throw Error(
-            `❌ The field "${fieldsInput[0].fieldName}" with the option "${fieldsInput[0].value} doesn't exist!"`
+            `❌ The field "${fieldsInput[0].fieldName}" with the option "${fieldsInput[0].value}" doesn't exist!`
         );
     }
     if (
