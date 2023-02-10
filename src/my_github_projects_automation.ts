@@ -412,7 +412,7 @@ async function handleActionEvent(
                 projectID,
                 issueProjectItemID,
                 projectFields.statusField.statusFieldID,
-                projectFields.statusField.inProgressOptionID
+                projectFields.statusField.inReviewOptionID
             );
             await addClosingReferenceToPullRequest(
                 octokit,
@@ -427,7 +427,7 @@ async function handleActionEvent(
     );
 }
 
-export async function run(): Promise<void> {
+export async function run(): Promise<string> {
     const context = github.context;
     const input = getInput(context.repo.owner);
     const octokit = new Octokit({ auth: input.githubToken });
@@ -441,5 +441,5 @@ export async function run(): Promise<void> {
         projectID,
         input.projectFields
     );
-    await handleActionEvent(octokit, context, projectID, projectFields);
+    return await handleActionEvent(octokit, context, projectID, projectFields);
 }
