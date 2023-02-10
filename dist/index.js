@@ -216,7 +216,7 @@ function getProjectFields(octokit, projectID, fieldsInput) {
                 if (option !== undefined) {
                     projectFields.push({ fieldID: field.id, optionID: option.id });
                 }
-                fieldsInput.slice(fieldIndex, 1);
+                fieldsInput.splice(fieldIndex, 1);
             }
         }
         if (statusFieldID === "" ||
