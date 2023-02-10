@@ -219,13 +219,13 @@ function getProjectFields(octokit, projectID, fieldsInput) {
                 fieldsInput.slice(fieldIndex, 1);
             }
         }
-        if (fieldsInput.length > 0) {
-            throw Error(`❌ The field "${fieldsInput[0].fieldName}" with the option "${fieldsInput[0].value}" doesn't exist!`);
-        }
         if (statusFieldID === "" ||
             inProgressOptionID === "" ||
             inReviewOptionID === "") {
             throw Error('❌ The field "Status" with the options "In progress" and "In review" doesn\'t exist!');
+        }
+        if (fieldsInput.length > 0) {
+            throw Error(`❌ The field "${fieldsInput[0].fieldName}" with the option "${fieldsInput[0].value}" doesn't exist!`);
         }
         return {
             statusField: {
