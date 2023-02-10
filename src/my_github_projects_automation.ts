@@ -283,6 +283,34 @@ async function getProjectFields(
     };
 }
 
+async function setProjectFieldOption(
+    octokit: Octokit,
+    projectID: string,
+    itemID: string,
+    fieldID: string,
+    optionID: string
+): Promise<void> {
+    await octokit.graphql(
+        `mutation changeIssueProjectStatus($input: UpdateProjectV2ItemFieldValueInput!) {
+                updateProjectV2ItemFieldValue(input: $input) {
+                    projectV2Item {
+                        id
+                    }
+                }
+            }`,
+        {
+            input: {
+                projectId: projectID,
+                itemId: itemID,
+                fieldId: fieldID,
+                value: {
+                    singleSelectOptionId: optionID,
+                },
+            },
+        }
+    );
+}
+
 async function handleActionEvent(
     octokit: Octokit,
     context: Context,
@@ -301,10 +329,18 @@ async function handleActionEvent(
                         projectID,
                         issueInfo?.node_id as string
                     );
-                    if (projectFields.otherFields.length > 0) {
+                    core.info("✅ Successfully added issue to project!");
+                    for (const field of projectFields.otherFields) {
+                        await setProjectFieldOption(
+                            octokit,
+                            projectID,
+                            issueProjectItemID,
+                            field.fieldID,
+                            field.optionID
+                        );
                     }
+                    core.info("✅ Successfully added issue to project!");
             }
-            core.info("✅ Successfully added issue to project!");
             break;
         case "assigned":
             break;
