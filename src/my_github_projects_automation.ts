@@ -102,6 +102,7 @@ async function handleActionEvent(
     input: Input
 ): Promise<void> {
     const payload = context.payload;
+    console.log("Event Name:", context.eventName);
     switch (context.eventName) {
         case "issue":
             const issueInfo = payload.issue;
@@ -127,5 +128,6 @@ export async function run(): Promise<void> {
         input.projectOwner,
         input.projectNumber
     );
+    console.log("projectID:", projectID);
     await handleActionEvent(octokit, context, projectID, input);
 }
