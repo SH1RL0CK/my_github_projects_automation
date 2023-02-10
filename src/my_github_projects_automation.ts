@@ -104,7 +104,7 @@ async function handleActionEvent(
     const payload = context.payload;
     console.log("Event Name:", context.eventName);
     switch (context.eventName) {
-        case "issue":
+        case "issues":
             const issueInfo = payload.issue;
             switch (payload.action) {
                 case "opened":
