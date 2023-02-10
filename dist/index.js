@@ -107,7 +107,7 @@ function getInput(repoOwner) {
 }
 function getProjectID(octokit, projectOwner, projectNumber) {
     return __awaiter(this, void 0, void 0, function* () {
-        let projectIDResponse = yield octokit.graphql(`query getProject($projectOwnerName: String!, $projectNumber: Int!) {
+        const projectIDResponse = yield octokit.graphql(`query getProject($projectOwnerName: String!, $projectNumber: Int!) {
                 user(login: $projectOwnerName) {
                     projectV2(number: $projectNumber) {
                         id
@@ -118,14 +118,14 @@ function getProjectID(octokit, projectOwner, projectNumber) {
             projectNumber: projectNumber,
         });
         if (projectIDResponse.user.projectV2 === null) {
-            throw Error(`Project with owner ${projectOwner} and number ${projectNumber} doesn't exist!`);
+            throw Error(`❌ Project with owner "${projectOwner}" and number "${projectNumber}" doesn't exist!`);
         }
         return projectIDResponse.user.projectV2.id;
     });
 }
 function addIssueToProejct(octokit, projectID, issueNodeID) {
     return __awaiter(this, void 0, void 0, function* () {
-        yield octokit.graphql(`mutation addIssueToProject($input: AddProjectV2ItemByIdInput!) {
+        const addIssueResponse = yield octokit.graphql(`mutation addIssueToProject($input: AddProjectV2ItemByIdInput!) {
                 addProjectV2ItemById(input: $input) {
                     item {
                         id
@@ -137,20 +137,121 @@ function addIssueToProejct(octokit, projectID, issueNodeID) {
                 contentId: issueNodeID,
             },
         });
+        return addIssueResponse.addProjectV2ItemById.item.id;
     });
 }
-function handleActionEvent(octokit, context, projectID, input) {
+function getIssueProjectItemID(octokit, issueNumber, projectID, repoName) {
+    var _a, _b;
+    return __awaiter(this, void 0, void 0, function* () {
+        const projectItemsResponse = yield octokit.graphql(`query getIssuesFromProject( $projectId: ID! ) {
+                node(id: $projectId) {
+                    ... on ProjectV2 {
+                        items(first: 100) {
+                            nodes {
+                                id
+                                content {
+                                    ... on Issue {
+                                        number
+                                        repository {
+                                            name
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }`, {
+            projectId: projectID,
+        });
+        for (const item of projectItemsResponse.node.items.nodes) {
+            if (item.content !== null &&
+                ((_a = item.content) === null || _a === void 0 ? void 0 : _a.number) === issueNumber &&
+                ((_b = item.content) === null || _b === void 0 ? void 0 : _b.repository.name) === repoName) {
+                return item.id;
+            }
+        }
+        return null;
+    });
+}
+function getProjectFields(octokit, projectID, fieldsInput) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const projectFieldsResponse = yield octokit.graphql(`query getProjectFields($projectId: ID!) {
+                node(id: $projectId) {
+                        ... on ProjectV2 {
+                            fields(first: 20) {
+                                nodes {
+                                ... on ProjectV2SingleSelectField {
+                                    id
+                                    name
+                                    options {
+                                        id
+                                        name
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }`, {
+            projectId: projectID,
+        });
+        let statusFieldID = "", inProgressOptionID = "", inReviewOptionID = "";
+        const projectFields = [];
+        for (const field of projectFieldsResponse.node.fields.nodes) {
+            if (field.name === "Status") {
+                statusFieldID = field.id;
+                for (const option of field.options) {
+                    if (option.name.includes("In Progress")) {
+                        inProgressOptionID = option.id;
+                    }
+                    else if (option.name.includes("In Review")) {
+                        inReviewOptionID = option.id;
+                    }
+                }
+                break;
+            }
+            const fieldIndex = fieldsInput.findIndex((element) => element.fieldName === field.name);
+            if (fieldIndex !== -1) {
+                const option = field.options.find((element) => element.name === fieldsInput[fieldIndex].value);
+                if (option !== undefined) {
+                    projectFields.push({ fieldID: field.id, optionID: option.id });
+                }
+                fieldsInput.slice(fieldIndex, 0);
+            }
+        }
+        if (fieldsInput.length > 0) {
+            throw Error(`❌ The field "${fieldsInput[0].fieldName}" with the option "${fieldsInput[0].value} doesn't exist!"`);
+        }
+        if (statusFieldID === "" ||
+            inProgressOptionID === "" ||
+            inReviewOptionID === "") {
+            throw Error('❌ The field "Status" with the options "In progress" and "In review" doesn\'t exist!');
+        }
+        return {
+            statusField: {
+                statusFieldID: statusFieldID,
+                inProgressOptionID: inProgressOptionID,
+                inReviewOptionID: inReviewOptionID,
+            },
+            otherFields: projectFields,
+        };
+    });
+}
+function handleActionEvent(octokit, context, projectID, projectFields) {
     return __awaiter(this, void 0, void 0, function* () {
         const payload = context.payload;
-        console.log("Event Name:", context.eventName);
         switch (context.eventName) {
             case "issues":
                 const issueInfo = payload.issue;
                 switch (payload.action) {
                     case "opened":
                         issueInfo.node_id;
-                        yield addIssueToProejct(octokit, projectID, issueInfo === null || issueInfo === void 0 ? void 0 : issueInfo.node_id);
+                        const issueProjectItemID = yield addIssueToProejct(octokit, projectID, issueInfo === null || issueInfo === void 0 ? void 0 : issueInfo.node_id);
+                        if (projectFields.otherFields.length > 0) {
+                        }
                 }
+                core.info("✅ Successfully added issue to project!");
                 break;
             case "assigned":
                 break;
@@ -163,8 +264,8 @@ function run() {
         const input = getInput(context.repo.owner);
         const octokit = github.getOctokit(input.githubToken);
         const projectID = yield getProjectID(octokit, input.projectOwner, input.projectNumber);
-        console.log("projectID:", projectID);
-        yield handleActionEvent(octokit, context, projectID, input);
+        const projectFields = yield getProjectFields(octokit, projectID, input.projectFields);
+        yield handleActionEvent(octokit, context, projectID, projectFields);
     });
 }
 exports.run = run;

@@ -23,6 +23,65 @@ interface ProjectIDResponse {
     };
 }
 
+interface ProjectAddIssueResponse {
+    addProjectV2ItemById: {
+        item: {
+            id: string;
+        };
+    };
+}
+
+interface ProjectItem {
+    id: string;
+    content?: {
+        number: number;
+        repository: {
+            name: string;
+        };
+    };
+}
+
+interface ProjectItemsResponse {
+    node: {
+        items: {
+            nodes: ProjectItem[];
+        };
+    };
+}
+
+interface ProjectField {
+    fieldID: string;
+    optionID: string;
+}
+
+interface ProjectFields {
+    statusField: {
+        statusFieldID: string;
+        inProgressOptionID: string;
+        inReviewOptionID: string;
+    };
+    otherFields: ProjectField[];
+}
+
+interface SingleSelectFieldOption {
+    id: string;
+    name: string;
+}
+
+interface SingleSelectField {
+    id: string;
+    name: string;
+    options: [SingleSelectFieldOption];
+}
+
+interface ProjectFieldsResponse {
+    node: {
+        fields: {
+            nodes: SingleSelectField[];
+        };
+    };
+}
+
 function getInput(repoOwner: string): Input {
     let githubToken = core.getInput("github-token", { required: true });
     let projectOwner = core.getInput("project-owner") || repoOwner;
@@ -56,23 +115,22 @@ async function getProjectID(
     projectOwner: string,
     projectNumber: number
 ): Promise<string> {
-    let projectIDResponse: ProjectIDResponse =
-        await octokit.graphql<ProjectIDResponse>(
-            `query getProject($projectOwnerName: String!, $projectNumber: Int!) {
+    const projectIDResponse = await octokit.graphql<ProjectIDResponse>(
+        `query getProject($projectOwnerName: String!, $projectNumber: Int!) {
                 user(login: $projectOwnerName) {
                     projectV2(number: $projectNumber) {
                         id
                     }
                 }
             }`,
-            {
-                projectOwnerName: projectOwner,
-                projectNumber: projectNumber,
-            }
-        );
+        {
+            projectOwnerName: projectOwner,
+            projectNumber: projectNumber,
+        }
+    );
     if (projectIDResponse.user.projectV2 === null) {
         throw Error(
-            `Project with owner ${projectOwner} and number ${projectNumber} doesn't exist!`
+            `❌ Project with owner "${projectOwner}" and number "${projectNumber}" doesn't exist!`
         );
     }
     return projectIDResponse.user.projectV2.id;
@@ -82,8 +140,8 @@ async function addIssueToProejct(
     octokit: Octokit,
     projectID: string,
     issueNodeID: string
-) {
-    await octokit.graphql(
+): Promise<string> {
+    const addIssueResponse = await octokit.graphql<ProjectAddIssueResponse>(
         `mutation addIssueToProject($input: AddProjectV2ItemByIdInput!) {
                 addProjectV2ItemById(input: $input) {
                     item {
@@ -98,28 +156,155 @@ async function addIssueToProejct(
             },
         }
     );
+    return addIssueResponse.addProjectV2ItemById.item.id;
+}
+
+async function getIssueProjectItemID(
+    octokit: Octokit,
+    issueNumber: number,
+    projectID: string,
+    repoName: string
+): Promise<string | null> {
+    const projectItemsResponse = await octokit.graphql<ProjectItemsResponse>(
+        `query getIssuesFromProject( $projectId: ID! ) {
+                node(id: $projectId) {
+                    ... on ProjectV2 {
+                        items(first: 100) {
+                            nodes {
+                                id
+                                content {
+                                    ... on Issue {
+                                        number
+                                        repository {
+                                            name
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }`,
+        {
+            projectId: projectID,
+        }
+    );
+    for (const item of projectItemsResponse.node.items.nodes) {
+        if (
+            item.content !== null &&
+            item.content?.number === issueNumber &&
+            item.content?.repository.name === repoName
+        ) {
+            return item.id;
+        }
+    }
+    return null;
+}
+
+async function getProjectFields(
+    octokit: Octokit,
+    projectID: string,
+    fieldsInput: ProjectFieldInput[]
+): Promise<ProjectFields> {
+    const projectFieldsResponse = await octokit.graphql<ProjectFieldsResponse>(
+        `query getProjectFields($projectId: ID!) {
+                node(id: $projectId) {
+                        ... on ProjectV2 {
+                            fields(first: 20) {
+                                nodes {
+                                ... on ProjectV2SingleSelectField {
+                                    id
+                                    name
+                                    options {
+                                        id
+                                        name
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }`,
+        {
+            projectId: projectID,
+        }
+    );
+
+    let statusFieldID = "",
+        inProgressOptionID = "",
+        inReviewOptionID = "";
+    const projectFields: ProjectField[] = [];
+    for (const field of projectFieldsResponse.node.fields.nodes) {
+        if (field.name === "Status") {
+            statusFieldID = field.id;
+            for (const option of field.options) {
+                if (option.name.includes("In Progress")) {
+                    inProgressOptionID = option.id;
+                } else if (option.name.includes("In Review")) {
+                    inReviewOptionID = option.id;
+                }
+            }
+            break;
+        }
+        const fieldIndex = fieldsInput.findIndex(
+            (element) => element.fieldName === field.name
+        );
+        if (fieldIndex !== -1) {
+            const option = field.options.find(
+                (element) => element.name === fieldsInput[fieldIndex].value
+            );
+            if (option !== undefined) {
+                projectFields.push({ fieldID: field.id, optionID: option.id });
+            }
+            fieldsInput.slice(fieldIndex, 0);
+        }
+    }
+    if (fieldsInput.length > 0) {
+        throw Error(
+            `❌ The field "${fieldsInput[0].fieldName}" with the option "${fieldsInput[0].value} doesn't exist!"`
+        );
+    }
+    if (
+        statusFieldID === "" ||
+        inProgressOptionID === "" ||
+        inReviewOptionID === ""
+    ) {
+        throw Error(
+            '❌ The field "Status" with the options "In progress" and "In review" doesn\'t exist!'
+        );
+    }
+    return {
+        statusField: {
+            statusFieldID: statusFieldID,
+            inProgressOptionID: inProgressOptionID,
+            inReviewOptionID: inReviewOptionID,
+        },
+        otherFields: projectFields,
+    };
 }
 
 async function handleActionEvent(
     octokit: Octokit,
     context: Context,
     projectID: string,
-    input: Input
+    projectFields: ProjectFields
 ): Promise<void> {
     const payload = context.payload;
-    console.log("Event Name:", context.eventName);
     switch (context.eventName) {
         case "issues":
             const issueInfo = payload.issue;
             switch (payload.action) {
                 case "opened":
                     issueInfo!.node_id;
-                    await addIssueToProejct(
+                    const issueProjectItemID = await addIssueToProejct(
                         octokit,
                         projectID,
                         issueInfo?.node_id as string
                     );
+                    if (projectFields.otherFields.length > 0) {
+                    }
             }
+            core.info("✅ Successfully added issue to project!");
             break;
         case "assigned":
             break;
@@ -135,6 +320,10 @@ export async function run(): Promise<void> {
         input.projectOwner,
         input.projectNumber
     );
-    console.log("projectID:", projectID);
-    await handleActionEvent(octokit, context, projectID, input);
+    const projectFields = await getProjectFields(
+        octokit,
+        projectID,
+        input.projectFields
+    );
+    await handleActionEvent(octokit, context, projectID, projectFields);
 }

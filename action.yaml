@@ -12,10 +12,10 @@ inputs:
         description: "A GitHub personal access token with write access to the project"
     field-names:
         required: false
-        description: A comma-separated list of fields
+        description: A comma-separated list of single select fields
     field-values:
         required: false
-        description: A comma-separated list of field values
+        description: A comma-separated list of single select options 
 runs:
     using: node16
     main: dist/index.js
