@@ -1,12 +1,25 @@
-name: "My Github Project Automation"
+name: My Github Project Automation
+
 on:
-    push:
+  issues:
+    types:
+      - opened
+      - assigned
+  pull_request:
+    types:
+      - opened
+    branches:
+      - main 
 
 jobs:
-    test:
-        runs-on: "ubuntu-latest"
-        steps:
-            - uses: actions/checkout@v3
-            - uses: ./
-              with:
-                  name: "hello"
+  project_automation:
+    runs-on: ubuntu-latest
+    name: Automate my GitHub project
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Automate my GitHub project
+        uses: ./ 
+        with:
+            project-number: 11 
+            github-token: ${{ secrets.PROJECT_AUTOMATION_PAT }}

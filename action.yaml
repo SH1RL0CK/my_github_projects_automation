@@ -1,10 +1,21 @@
-name: "My GitHub Projects Automation"
-description: "A GitHub action to automate my GitHub projects"
-author: "SH1RL0CK"
+name: My GitHub Projects Automations
+description: Automate my GitHub Projects
 inputs:
-    name: # change this
+    project-owner:
+        required: false
+        description: "The owner of the project"
+    project-number:
         required: true
-        description: "Name you want to greet"
+        description: "The number of the project. Get this from the URL."
+    github-token:
+        required: true
+        description: "A GitHub personal access token with write access to the project"
+    field-names:
+        required: false
+        description: A comma-separated list of fields
+    field-values:
+        required: false
+        description: A comma-separated list of field values
 runs:
-    using: "node16"
-    main: "dist/index.js"
+    using: node16
+    main: dist/index.js

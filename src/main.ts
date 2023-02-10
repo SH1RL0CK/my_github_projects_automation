@@ -1,5 +1,11 @@
-import * as core from '@actions/core';
+import * as core from "@actions/core";
+import { run } from "./my_github_projects_automation";
 
-const name = core.getInput("name", { required: true });
-console.log(`hello ${name}`);
-core.setOutput("name", name);
+run()
+    .catch((error) => {
+        core.setFailed(error.message);
+        process.exit(1);
+    })
+    .then(() => {
+        process.exit(0);
+    });
