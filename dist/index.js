@@ -305,7 +305,7 @@ function handleActionEvent(octokit, context, projectID, projectFields) {
                 }
                 const issueNumber = yield getIusseNumberFromBranchName(payload.pull_request.head.ref);
                 issueProjectItemID = yield getIssueProjectItemID(octokit, projectID, issueNumber, context.repo.repo);
-                yield setProjectFieldOption(octokit, projectID, issueProjectItemID, projectFields.statusField.statusFieldID, projectFields.statusField.inProgressOptionID);
+                yield setProjectFieldOption(octokit, projectID, issueProjectItemID, projectFields.statusField.statusFieldID, projectFields.statusField.inReviewOptionID);
                 yield addClosingReferenceToPullRequest(octokit, context, payload.pull_request.number, issueNumber);
                 return 'Successfully set issue\'s status to in "In review" and added closing review to pull request';
         }
@@ -319,7 +319,7 @@ function run() {
         const octokit = new octokit_1.Octokit({ auth: input.githubToken });
         const projectID = yield getProjectID(octokit, input.projectOwner, input.projectNumber);
         const projectFields = yield getProjectFields(octokit, projectID, input.projectFields);
-        yield handleActionEvent(octokit, context, projectID, projectFields);
+        return yield handleActionEvent(octokit, context, projectID, projectFields);
     });
 }
 exports.run = run;
