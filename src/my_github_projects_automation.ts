@@ -320,7 +320,7 @@ async function getIusseNumberFromBranchName(
     const branchMatch = branchName.match(branchParse);
     if (!branchMatch) {
         throw new Error(
-            `Invalid branch name: ${branchName}. Feature branches names should match the format feature/<issueNumber>-<issueTopic>`
+            `Invalid branch name: "${branchName}". Feature branches names should match the format "feature/<issueNumber>-<issueTopic>"`
         );
     }
     return parseInt(branchMatch.groups!.issueNumber);
@@ -386,16 +386,16 @@ async function handleActionEvent(
                         projectFields.statusField.statusFieldID,
                         projectFields.statusField.inProgressOptionID
                     );
-                    return 'Successfully set issue\'s status to in "In progress"';
+                    return 'Successfully set issue\'s status to "In progress"';
                 default:
                     throw Error(
-                        `Unexpected issue action: "${payload.action}." Please only use "opened" or "assigned"`
+                        `Unexpected issue action: "${payload.action}". Please only use "opened" or "assigned"`
                     );
             }
         case "pull_request":
             if (payload.action !== "opened") {
                 throw Error(
-                    `Unexpected pull request action: "${payload.action}." Please only use "opened"`
+                    `Unexpected pull request action: "${payload.action}". Please only use "opened"`
                 );
             }
             const issueNumber = await getIusseNumberFromBranchName(
@@ -420,7 +420,7 @@ async function handleActionEvent(
                 payload.pull_request!.number,
                 issueNumber
             );
-            return 'Successfully set issue\'s status to in "In review" and added closing review to pull request';
+            return 'Successfully set issue\'s status to "In review" and added closing review to pull request';
     }
     throw Error(
         `Unexpected event: "${context.eventName}". Please only use "issue" or "pull_request"`

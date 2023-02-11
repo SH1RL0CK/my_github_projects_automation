@@ -264,7 +264,7 @@ function getIusseNumberFromBranchName(branchName) {
         const branchParse = /^feature\/(?<issueNumber>\d+)-[a-zA-Z0-9\-]*$/;
         const branchMatch = branchName.match(branchParse);
         if (!branchMatch) {
-            throw new Error(`Invalid branch name: ${branchName}. Feature branches names should match the format feature/<issueNumber>-<issueTopic>`);
+            throw new Error(`Invalid branch name: "${branchName}". Feature branches names should match the format "feature/<issueNumber>-<issueTopic>"`);
         }
         return parseInt(branchMatch.groups.issueNumber);
     });
@@ -295,19 +295,19 @@ function handleActionEvent(octokit, context, projectID, projectFields) {
                     case "assigned":
                         issueProjectItemID = yield getIssueProjectItemID(octokit, projectID, issueInfo.number, context.repo.repo);
                         yield setProjectFieldOption(octokit, projectID, issueProjectItemID, projectFields.statusField.statusFieldID, projectFields.statusField.inProgressOptionID);
-                        return 'Successfully set issue\'s status to in "In progress"';
+                        return 'Successfully set issue\'s status to "In progress"';
                     default:
-                        throw Error(`Unexpected issue action: "${payload.action}." Please only use "opened" or "assigned"`);
+                        throw Error(`Unexpected issue action: "${payload.action}". Please only use "opened" or "assigned"`);
                 }
             case "pull_request":
                 if (payload.action !== "opened") {
-                    throw Error(`Unexpected pull request action: "${payload.action}." Please only use "opened"`);
+                    throw Error(`Unexpected pull request action: "${payload.action}". Please only use "opened"`);
                 }
                 const issueNumber = yield getIusseNumberFromBranchName(payload.pull_request.head.ref);
                 issueProjectItemID = yield getIssueProjectItemID(octokit, projectID, issueNumber, context.repo.repo);
                 yield setProjectFieldOption(octokit, projectID, issueProjectItemID, projectFields.statusField.statusFieldID, projectFields.statusField.inReviewOptionID);
                 yield addClosingReferenceToPullRequest(octokit, context, payload.pull_request.number, issueNumber);
-                return 'Successfully set issue\'s status to in "In review" and added closing review to pull request';
+                return 'Successfully set issue\'s status to "In review" and added closing review to pull request';
         }
         throw Error(`Unexpected event: "${context.eventName}". Please only use "issue" or "pull_request"`);
     });
