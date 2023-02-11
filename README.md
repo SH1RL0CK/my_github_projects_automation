@@ -19,7 +19,7 @@
 - `project-number` **(required)** is the project number. Get this from the URL.
 - `github-token` **(required)** is a [personal access
   token](https://github.com/settings/tokens/new) with `repo` and `project` scopes.
-  _See [Creating a PAT and adding it to your repository](https://github.com/actions/add-to-project/blob/main/README.md#creating-a-pat-and-adding-it-to-your-repository) for more details_
+  _See [Creating a PAT and adding it to your repository](https://github.com/actions/add-to-project/blob/main/README.md#creating-a-pat-and-adding-it-to-your-repository) for more details_.
 - `field-names` are GitHub project single select field names separated with `,`.
 - `field-values`</a> are the GitHub project field values associated to the `field-names` separated with `,`.
 
