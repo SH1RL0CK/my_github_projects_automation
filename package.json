@@ -6,8 +6,7 @@
     "scripts": {
         "build": "npm run build:compile && npm run build:package",
         "build:compile": "tsc",
-        "build:package": "ncc build --source-map --license licenses.txt",
-        "prepare": "husky install"
+        "build:package": "ncc build --source-map --license licenses.txt"
     },
     "repository": {
         "type": "git",
