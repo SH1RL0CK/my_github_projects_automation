@@ -53,3 +53,7 @@ jobs:
                   field-names: Repo,Type
                   field-values: Server,Bug
 ```
+
+## Special mentions
+
+I want to say thanks to the authors and contributors of [update-project-fields](https://github.com/titoportas/update-project-fields), [add-to-project](https://github.com/actions/add-to-project) and [project-update](https://github.com/austenstone/project-update). These projects were were a huge insperation for this action.
