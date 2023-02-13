@@ -1,6 +1,6 @@
 {
     "name": "my_github_projects_automation",
-    "version": "0.0.0",
+    "version": "1.0.0",
     "description": "A GitHub action to automate my GitHub projects",
     "main": "lib/main.js",
     "scripts": {
